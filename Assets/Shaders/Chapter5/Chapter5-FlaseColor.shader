@@ -1,71 +1,58 @@
 ﻿// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
 
-Shader "Unity Shaders Book/Chapter 5/Flase Color" {
+Shader "UnityShaderLearn/Chapter 5/Flase Color" {
+	Properties {
+		_Diffuse ("Diffuse", Color) = (1,1,1,1)
+		
+	}
 	SubShader {
-		Pass {
+		Pass {		
+			Tags { "LightMode"="ForwardBase" }
+	
 			CGPROGRAM
-
 			#pragma vertex vert
 			#pragma fragment frag
 
-			#include "UnityCG.cginc"
+			#include "Lighting.cginc"
 
-			struct v2f{
-				float4 pos : SV_POSITION;
-				fixed  color : COLOR0;
+			fixed4 _Diffuse;
+
+			struct a2v {
+				float4 vertex : POSITION;
+				float3 normal : NORMAL;
 			};
 
-			v2f vert(appdata_full v) {
+			struct v2f {
+				float4 pos : SV_POSITION;
+				fixed3 color : COLOR;
+			};
+
+			v2f vert(a2v v) {
 				v2f o;
+				// Transform the vertex form object space to projection space
 				o.pos = UnityObjectToClipPos(v.vertex);
 
-				//可视化法线方向
-				o.color = fixed4(v.normal * 0.5 + fixed3(0.5, 0.5, 0.5), 1.0);
-				
+				// Get ambient term
+				fixed3 ambient = UNITY_LIGHTMODEL_AMBIENT.xyz;
 
-				//可视化切线方向
-				o.color = fixed4(v.tangent.xyz * 0.5 + fixed3(0.5, 0.5, 0.5), 1.0);
+				// Transform the normal fram object space to world space
+				fixed3 worldNormal = normalize(mul(v.normal, (float3x3)unity_WorldToObject));
+				// Get the light direction in world space
+				fixed3 worldLight =  normalize(_WorldSpaceLightPos0.xyz);
+				// Compute diffuse term
+				fixed diffuse = _LightColor0.rgb * _Diffuse.rgb * saturate(dot(worldNormal, worldLight));
 
-				//可视化副切线方向
-				fixed3 binormal = cross(v.normal, v.tangent.xyz) * v.tangent.w;
-				o.color = fixed4(binormal * 0.5 + fixed3(0.5, 0.5, 0.5), 1.0);
-
-				//可视化第一组纹理坐标
-				o.color = fixed4(v.texcoord.xy, 0.0, 1.0);
-				
-				//可视化第二组纹理坐标
-				o.color = fixed4(v.texcoord1.xy, 0.0, 1.0);
-
-				////可视化第一组纹理坐标的小数部分
-				//o.color = frac(v.texcoord);
-				//if (any(saturate(v.texcoord) - v.texcoord)) 
-				//{
-				//	o.color.b = 0.5;
-				//}
-				//o.color.a = 1.0;
-
-				////可视化第二组纹理坐标的小数部分
-				//o.color = frac(v.texcoord1);
-				//if (any(saturate(v.texcoord1) - v.texcoord1)) 
-				//{
-				//	o.color.b = 0.5;
-				//}
-				//o.color.a = 1.0;
-
-				//可视化顶点颜色
-				o.color = v.color;
+				o.color = ambient + diffuse;
 
 				return o;
 			}
 
-			fixed4 frag(v2f i) :SV_Target
-			{
-				return i.color;
+			fixed4 frag(v2f i) : SV_Target {
+				return fixed4(i.color, 1.0);
 			}
-
+			
 			ENDCG
 		}
 	}
-
 	FallBack "Diffuse"
 }
