@@ -1,4 +1,8 @@
-﻿Shader "UnityShaderLearn/Chapter6-SpecularVertexLevel" {
+﻿// Upgrade NOTE: replaced '_Object2World' with 'unity_ObjectToWorld'
+// Upgrade NOTE: replaced '_World2Object' with 'unity_WorldToObject'
+// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
+
+Shader "UnityShaderLearn/Chapter6-SpecularVertexLevel" {
 	Properties {
 		_Diffuse("Diffuse", Color) = (1, 1, 1, 1)
 		_Specular("Specular", Color) = (1, 1, 1, 1)
@@ -23,30 +27,30 @@
 			};
 
 			struct v2f {
-				float pos : SV_POSITION;
-				fixed color : COLOR;
-			}
+				float4 pos : SV_POSITION;
+				fixed3 color : COLOR;
+			};
 
 			v2f vert(a2v v) {
 				v2f o;
 				// Transform the vertex from object space to projection space
-				o.pos = mul(UNITY_MATRIX_MVP, v.vertex);
+				o.pos = UnityObjectToClipPos(v.vertex);
 
 				// Get ambient term
 				fixed3 ambient = UNITY_LIGHTMODEL_AMBIENT.xyz;
 
 				// Transform the normal fram object space to world space
-				fixed3 worldNormal = normalize(mul(v.normal, (float3x3)_World2Object));
+				fixed3 worldNormal = normalize(mul(v.normal, (float3x3)unity_WorldToObject));
 				// Get the light direction in world space
 				fixed3 worldLightDir = normalize(_WorldSpaceLightPos0.xyz);
 
 				// Compute diffuse term
-				fixed3 diffuse = _LightColor0.rgb * _Diffuse.rgb * staturate(dot(worldNormal, worldLightDir));
+				fixed3 diffuse = _LightColor0.rgb * _Diffuse.rgb * saturate(dot(worldNormal, worldLightDir));
 
 				// Get the reflect direction in world space
-				fixed3 reflectDir = normalize(reflect(_wolrdLightDir, worldNormal));
+				fixed3 reflectDir = normalize(reflect(-worldLightDir, worldNormal));
 				// Get the view direction in world space
-				fixed3 viewDir = normalize(_WorldSpaceCameraPos.xyz - mul(_Object2World, v.vertex).xyz);
+				fixed3 viewDir = normalize(_WorldSpaceCameraPos.xyz - mul(unity_ObjectToWorld, v.vertex).xyz);
 
 				// Compute specular term
 				fixed3 specular = _LightColor0.rgb * _Specular.rgb * pow(saturate(dot(reflectDir, viewDir)), _Gloss);
@@ -56,10 +60,14 @@
 				return o;
 			}
 
+			fixed4 frag(v2f i) : SV_Target {
+				return fixed4(i.color, 1.0);
+			}
+
 			
 
 			ENDCG
 		}
 	}
-	FallBack "Diffuse"
+	FallBack "Specular"
 }
