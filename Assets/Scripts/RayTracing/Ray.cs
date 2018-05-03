@@ -2,22 +2,24 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Ray
+namespace RayTracying
 {
-    public Vector3 original;
-    public Vector3 direction;
-    public Vector3 normalDirection;
-    public Ray (Vector3 o, Vector3 d)
+    public class Ray
     {
-        original = o;
-        direction = d;
-        normalDirection = d.normalized;
-    }
+        public Vector3 original;
+        public Vector3 direction;
+        public Vector3 normalDirection;
+        public Ray(Vector3 o, Vector3 d)
+        {
+            original = o;
+            direction = d;
+            normalDirection = d.normalized;
+        }
 
-    public Vector3 GetPoint(float t)
-    {
-        return original + t * direction;
-    }
+        public Vector3 GetPoint(float t)
+        {
+            return original + t * direction;
+        }
 
+    }
 }
-
