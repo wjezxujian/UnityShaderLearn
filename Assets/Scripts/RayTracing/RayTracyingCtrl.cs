@@ -12,7 +12,7 @@ namespace RayTracying
         // Use this for initialization
         private const int WIDTH = 800;
         private const int HEIGHT = 400;
-        private const string IMG_PATH = "C:/Users/jian/Desktop/RayTracing.png";
+        private const string IMG_PATH = "C:/Users/jian.xu/Desktop/RayTracing.png";
         private const int SAMPLE = 100;
         private float SAMPLE_WEIGHT = 0.01f;
 
@@ -350,7 +350,7 @@ namespace RayTracying
                     color *= SAMPLE_WEIGHT;
 
                     //为了使球体看起来更亮， 改变gamma值
-                    //color = new Color(Mathf.sqrt(color.r), Mathf.sqrt(color.g), Mathf.sqrt(color.b), 1f);
+                    color = new Color(Mathf.Sqrt(color.r), Mathf.Sqrt(color.g), Mathf.Sqrt(color.b), 1f);
                     color.a = 1f;
                     colors[i + j * width] = color;
                 }
