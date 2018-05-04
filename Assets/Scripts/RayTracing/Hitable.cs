@@ -10,6 +10,7 @@ namespace RayTracying
         public float t;
         public Vector3 p;
         public Vector3 normal;
+        public Material material;
     }
     public abstract class Hitable
     {
@@ -20,10 +21,12 @@ namespace RayTracying
     {
         public Vector3 center;
         public float radius;
-        public Sphere(Vector3 cen, float rad)
+        public Material material;
+        public Sphere(Vector3 cen, float rad, Material mat = null)
         {
             center = cen;
             radius = rad;
+            material = mat;
         }
 
         public override bool Hit(Ray ray, float t_min, float t_max, ref HitRecord rec)
@@ -44,6 +47,7 @@ namespace RayTracying
                     rec.t = temp;
                     rec.p = ray.GetPoint(rec.t);
                     rec.normal = (rec.p - center).normalized;
+                    rec.material = material;
                     return true;
                 }
 
@@ -54,6 +58,7 @@ namespace RayTracying
                     rec.t = temp;
                     rec.p = ray.GetPoint(rec.t);
                     rec.normal = (rec.p - center).normalized;
+                    rec.material = material;
                     return true;
                 }
             }

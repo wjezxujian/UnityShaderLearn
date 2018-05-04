@@ -12,9 +12,10 @@ namespace RayTracying
         // Use this for initialization
         private const int WIDTH = 800;
         private const int HEIGHT = 400;
-        private const string IMG_PATH = "C:/Users/jian.xu/Desktop/RayTracing.png";
+        private const string IMG_PATH = "C:/Users/jian/Desktop/RayTracing.png";
         private const int SAMPLE = 100;
         private float SAMPLE_WEIGHT = 0.01f;
+        private int MAX_SCATTER_TIME = 50;
 
         [MenuItem("RayTracing/光线追踪渲染器")]
         public static void OnClick()
@@ -52,6 +53,10 @@ namespace RayTracying
             if (GUILayout.Button("测试散射模型"))
             {
                 CreatePng(WIDTH, HEIGHT, CreateColorForTestDiffusing(WIDTH, HEIGHT));
+            }
+            if (GUILayout.Button("测试镜面模型"))
+            {
+                CreatePng(WIDTH, HEIGHT, CrateColorForTestMetal(WIDTH, HEIGHT));
             }
 
         }
@@ -359,6 +364,68 @@ namespace RayTracying
             return colors;
         }
         #endregion
+
+        #region 第八版（测试镜面）
+        Color GetColorForTestMetal(Ray ray, HitableList hitableList, int depth)
+        {
+            HitRecord record = new HitRecord();
+            if(hitableList.Hit(ray, 0.0001f, float.MaxValue, ref record))
+            {
+                Ray r = new Ray(Vector3.zero, Vector3.zero);
+                Color attenuation = Color.black;
+                if(depth < MAX_SCATTER_TIME && record.material.scatter(ray, record, ref attenuation, ref r))
+                {
+                    Color c = GetColorForTestMetal(r, hitableList, depth + 1);
+                    return new Color(c.r * attenuation.r, c.g * attenuation.g, c.b * attenuation.b);
+                }
+                else
+                {
+                    //假设已经反射了太多次，或者压根就没有发生反射，那么就认为黑了
+                    return Color.black;
+                }
+            }
+            float t = 0.5f * ray.normalDirection.y + 1f;
+            return (1 - t) * new Color(1, 1, 1) + t * new Color(0.5f, 0.7f, 1f);
+        }
+        
+        Color[] CrateColorForTestMetal(int width, int height)
+        {
+            //视锥体的左下角，长宽和起始扫射设定
+            Vector3 lowLeftCorner = new Vector3(-2, -1, -1);
+            Vector3 horizontal = new Vector3(4, 0, 0);
+            Vector3 vertical = new Vector3(0, 2, 0);
+            Vector3 original = new Vector3(0, 0, 0);
+            int l = width * height;
+            HitableList hitableList = new HitableList();
+            hitableList.list.Add(new Sphere(new Vector3(0, 0, -1), 0.5f, new Lambertian(new Color(0.8f, 0.3f, 0.3f))));
+            hitableList.list.Add(new Sphere(new Vector3(0, -100.5f, -1), 100f, new Lambertian(new Color(0.8f, 0.8f, 0.0f))));
+            hitableList.list.Add(new Sphere(new Vector3(1, 0, -1), 0.5f, new Metal(new Color(0.8f, 0.6f, 0.2f))));
+            hitableList.list.Add(new Sphere(new Vector3(-1, 0, -1), 0.5f, new Metal(new Color(0.8f, 0.8f, 0.8f))));
+            Color[] colors = new Color[l];
+            Camera camera = new Camera(original, lowLeftCorner, horizontal, vertical);
+            float recip_width = 1f / width;
+            float recip_height = 1f / height;
+            for(int j = height - 1; j > 0; j--)
+            {
+                for(int i = 0; i < width; i++)
+                {
+                    Color color = new Color(0, 0, 0);
+                    for(int s = 0; s < SAMPLE; s++)
+                    {
+                        Ray r = camera.CreateRay((i + Random.Range(0f, 1f)) * recip_width, j + Random.Range(0f, 1f) * recip_height);
+                        color += GetColorForTestMetal(r, hitableList, 0);
+                    }
+                    color *= SAMPLE_WEIGHT;
+                    //为了使球体看起来更亮，改变gamma值
+                    color = new Color(Mathf.Sqrt(color.r), Mathf.Sqrt(color.g), Mathf.Sqrt(color.b), 1f);
+                    color.a = 1f;
+                    colors[i + j * width] = color;
+                }
+            }
+            return colors;
+        }
+        #endregion
+
 
     }
 
