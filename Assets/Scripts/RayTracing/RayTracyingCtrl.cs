@@ -12,10 +12,13 @@ namespace RayTracying
         // Use this for initialization
         private const int WIDTH = 800;
         private const int HEIGHT = 400;
-        private const string IMG_PATH = "C:/Users/jian/Desktop/RayTracing.png";
+        private string IMG_PATH = "";
+        private string IMG_PATH2 = "C:/Users/jian.xu/Desktop/";
         private const int SAMPLE = 100;
         private float SAMPLE_WEIGHT = 0.01f;
         private int MAX_SCATTER_TIME = 50;
+
+        private long m_rayTimes = 0;
 
         [MenuItem("RayTracing/光线追踪渲染器")]
         public static void OnClick()
@@ -28,35 +31,48 @@ namespace RayTracying
         {
             if (GUILayout.Button("测试图片"))
             {
+                IMG_PATH = IMG_PATH2 + "RayTracing1.png";
                 CreatePng(WIDTH, HEIGHT, CreateColorForTestPNG(WIDTH, HEIGHT));
             }
             if (GUILayout.Button("测试射线"))
             {
+                IMG_PATH = IMG_PATH2 + "RayTracing2.png";
                 CreatePng(WIDTH, HEIGHT, CreateColorForTestRay(WIDTH, HEIGHT));
             }
             if (GUILayout.Button("测试简单球体"))
             {
+                IMG_PATH = IMG_PATH2 + "RayTracing3.png";
                 CreatePng(WIDTH, HEIGHT, CreateColorTestSphere(WIDTH, HEIGHT));
             }
             if (GUILayout.Button("测试球体法线"))
             {
+                IMG_PATH = IMG_PATH2 + "RayTracing4.png";
                 CreatePng(WIDTH, HEIGHT, createColorForTestNormal(WIDTH, HEIGHT));
             }
             if (GUILayout.Button("抽象碰撞信息"))
             {
+                IMG_PATH = IMG_PATH2 + "RayTracing5.png";
                 CreatePng(WIDTH, HEIGHT, CreateColorForTestHitRecord(WIDTH, HEIGHT));
             }
             if (GUILayout.Button("测试反锯齿"))
             {
+                IMG_PATH = IMG_PATH2 + "RayTracing6.png";
                 CreatePng(WIDTH, HEIGHT, CreateColorForTestAntialiasing(WIDTH, HEIGHT));
             }
             if (GUILayout.Button("测试散射模型"))
             {
+                IMG_PATH = IMG_PATH2 + "RayTracing7.png";
                 CreatePng(WIDTH, HEIGHT, CreateColorForTestDiffusing(WIDTH, HEIGHT));
             }
             if (GUILayout.Button("测试镜面模型"))
             {
-                CreatePng(WIDTH, HEIGHT, CrateColorForTestMetal(WIDTH, HEIGHT));
+                IMG_PATH = IMG_PATH2 + "RayTracing8.png";
+                CreatePng(WIDTH, HEIGHT, CreateColorForTestMetal(WIDTH, HEIGHT));
+            }
+            if (GUILayout.Button("测试透明模型"))
+            {
+                IMG_PATH = IMG_PATH2 + "RayTracing9.png";
+                CreatePng(WIDTH, HEIGHT, CreateColorForTestDielectric(WIDTH, HEIGHT));
             }
 
         }
@@ -368,6 +384,7 @@ namespace RayTracying
         #region 第八版（测试镜面）
         Color GetColorForTestMetal(Ray ray, HitableList hitableList, int depth)
         {
+            ++m_rayTimes;
             HitRecord record = new HitRecord();
             if(hitableList.Hit(ray, 0.0001f, float.MaxValue, ref record))
             {
@@ -388,7 +405,7 @@ namespace RayTracying
             return (1 - t) * new Color(1, 1, 1) + t * new Color(0.5f, 0.7f, 1f);
         }
         
-        Color[] CrateColorForTestMetal(int width, int height)
+        Color[] CreateColorForTestMetal(int width, int height)
         {
             //视锥体的左下角，长宽和起始扫射设定
             Vector3 lowLeftCorner = new Vector3(-2, -1, -1);
@@ -399,26 +416,91 @@ namespace RayTracying
             HitableList hitableList = new HitableList();
             hitableList.list.Add(new Sphere(new Vector3(0, 0, -1), 0.5f, new Lambertian(new Color(0.8f, 0.3f, 0.3f))));
             hitableList.list.Add(new Sphere(new Vector3(0, -100.5f, -1), 100f, new Lambertian(new Color(0.8f, 0.8f, 0.0f))));
-            hitableList.list.Add(new Sphere(new Vector3(1, 0, -1), 0.5f, new Metal(new Color(0.8f, 0.6f, 0.2f))));
-            hitableList.list.Add(new Sphere(new Vector3(-1, 0, -1), 0.5f, new Metal(new Color(0.8f, 0.8f, 0.8f))));
+            hitableList.list.Add(new Sphere(new Vector3(1, 0, -1), 0.5f, new Metal(new Color(0.8f, 0.6f, 0.2f), 1.0f)));
+            hitableList.list.Add(new Sphere(new Vector3(-1, 0, -1), 0.5f, new Metal(new Color(0.8f, 0.8f, 0.8f), 0.3f)));
             Color[] colors = new Color[l];
             Camera camera = new Camera(original, lowLeftCorner, horizontal, vertical);
             float recip_width = 1f / width;
             float recip_height = 1f / height;
-            for(int j = height - 1; j > 0; j--)
+            for(int j = height - 1; j >= 0; j--)
             {
                 for(int i = 0; i < width; i++)
                 {
                     Color color = new Color(0, 0, 0);
                     for(int s = 0; s < SAMPLE; s++)
                     {
-                        Ray r = camera.CreateRay((i + Random.Range(0f, 1f)) * recip_width, j + Random.Range(0f, 1f) * recip_height);
+                        Ray r = camera.CreateRay((i + Random.Range(0f, 1f)) * recip_width, (j + Random.Range(0f, 1f)) * recip_height);
                         color += GetColorForTestMetal(r, hitableList, 0);
                     }
                     color *= SAMPLE_WEIGHT;
                     //为了使球体看起来更亮，改变gamma值
                     color = new Color(Mathf.Sqrt(color.r), Mathf.Sqrt(color.g), Mathf.Sqrt(color.b), 1f);
                     color.a = 1f;
+                    colors[i + j * width] = color;
+                }
+            }
+
+            Debug.Log("RayTracing time: %l" + m_rayTimes.ToString());
+
+            return colors;
+        }
+        #endregion
+
+        #region 第九版（测试透明）
+        Color GetColorForTestDielectric(Ray ray, Hitable hitableList, int depth)
+        {
+            HitRecord record = new HitRecord();
+            if(hitableList.Hit(ray, 0.0001f, float.MaxValue, ref record))
+            {
+                Ray r = new Ray(Vector3.zero, Vector3.zero);
+                Color attenuation = Color.black;
+                if(depth < MAX_SCATTER_TIME && record.material.scatter(ray, record, ref attenuation, ref r))
+                {
+                    Color c = GetColorForTestDielectric(r, hitableList, depth + 1);
+                    return new Color(c.r * attenuation.r, c.g * attenuation.g, c.b * attenuation.b);
+                }
+                else
+                {
+                    //假设已经反射了太多次，或者压根没有发生反射，那么就默认黑了
+                    return Color.black;
+                }
+            }
+            float t = 0.5f * ray.normalDirection.y + 1f;
+            return (1 - t) * new Color(1, 1, 1) + t * new Color(0.5f, 0.7f, 1.0f);
+        }
+
+        Color[] CreateColorForTestDielectric(int width, int height)
+        {
+            //视锥体的左下角，长宽和起始扫射点设定
+            Vector3 lowLeftCorner = new Vector3(-2, -1, -1);
+            Vector3 horizontal = new Vector3(4, 0, 0);
+            Vector3 vertical = new Vector3(0, 2, 0);
+            Vector3 original = new Vector3(0, 0, 0);
+            int l = width * height;
+            HitableList hitalbeList = new HitableList();
+            hitalbeList.list.Add(new Sphere(new Vector3(0, 0, -1), 0.5f, new Lambertian(new Color(0.1f, 0.2f, 0.5f))));
+            hitalbeList.list.Add(new Sphere(new Vector3(0, -100.5f, -1), 100f, new Lambertian(new Color(0.8f, 0.8f, 0.0f))));
+            hitalbeList.list.Add(new Sphere(new Vector3(1, 0, -1), 0.5f, new Metal(new Color(0.8f, 0.6f, 0.2f), 0.0f)));
+            hitalbeList.list.Add(new Sphere(new Vector3(-1, 0, -1), 0.5f, new Dielectric(1.5f)));
+            hitalbeList.list.Add(new Sphere(new Vector3(-1, 0, -1), -0.45f, new Dielectric(1.5f)));
+            Color[] colors = new Color[l];
+            Camera camera = new Camera(original, lowLeftCorner, horizontal, vertical);
+            float recip_width = 1f / width;
+            float recip_height = 1f / height;
+            for(int j = height - 1; j >= 0; j--)
+            {
+                for(int i = 0; i < width; i++)
+                {
+                    Color color = new Color(0, 0, 0);
+                    for(int s = 0; s < SAMPLE; s++)
+                    {
+                        Ray r = camera.CreateRay((i + _M.R()) * recip_width, (j + _M.R()) *recip_height);
+                        color += GetColorForTestDielectric(r, hitalbeList, 0);
+                    }
+                    color *= SAMPLE_WEIGHT;
+                    //为了使球体看起来更亮，改变gamma值
+                    color = new Color(Mathf.Sqrt(color.r), Mathf.Sqrt(color.g), Mathf.Sqrt(color.b), 1f);
+                    color.a = 1;
                     colors[i + j * width] = color;
                 }
             }

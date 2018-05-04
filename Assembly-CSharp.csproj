@@ -60,6 +60,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Scripts\Chapter5\ColorPicker.cs" />
+    <Compile Include="Assets\Scripts\RayTracing\_M.cs" />
     <Compile Include="Assets\Scripts\RayTracing\Camera.cs" />
     <Compile Include="Assets\Scripts\RayTracing\Hitable.cs" />
     <Compile Include="Assets\Scripts\RayTracing\Material.cs" />
