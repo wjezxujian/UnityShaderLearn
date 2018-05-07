@@ -37,10 +37,9 @@ namespace RayTracying
             float c = Vector3.Dot(oc, oc) - radius * radius;
             //实际上是判断这个方程有没有根，如果有2个根就是击中
             float discriminant = b * b - 4 * a * c;
-
             if (discriminant > 0)
             {
-                //带入计算出最靠近射线源的点
+                //带入并计算出最靠近射线源的点
                 float temp = (-b - Mathf.Sqrt(discriminant)) / a * 0.5f;
                 if (temp < t_max && temp > t_min)
                 {
@@ -50,8 +49,7 @@ namespace RayTracying
                     rec.material = material;
                     return true;
                 }
-
-                //否则就计算远离射线的点
+                //否则就计算远离射线源的点
                 temp = (-b + Mathf.Sqrt(discriminant)) / a * 0.5f;
                 if (temp < t_max && temp > t_min)
                 {

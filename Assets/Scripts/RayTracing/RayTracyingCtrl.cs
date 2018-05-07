@@ -13,7 +13,7 @@ namespace RayTracying
         private const int WIDTH = 800;
         private const int HEIGHT = 400;
         private string IMG_PATH = "";
-        private string IMG_PATH2 = "C:/Users/jian.xu/Desktop/";
+        private string IMG_PATH2 = "C:/Users/jian/Desktop/";
         private const int SAMPLE = 100;
         private float SAMPLE_WEIGHT = 0.01f;
         private int MAX_SCATTER_TIME = 50;
@@ -74,9 +74,26 @@ namespace RayTracying
                 IMG_PATH = IMG_PATH2 + "RayTracing9.png";
                 CreatePng(WIDTH, HEIGHT, CreateColorForTestDielectric(WIDTH, HEIGHT));
             }
+            if (GUILayout.Button("测试景深"))
+            {
+                IMG_PATH = IMG_PATH2 + "RayTracing11.png";
+                CreatePng(WIDTH, HEIGHT, CreateColorForTestDefocus(WIDTH, HEIGHT));
+            }
+            if (GUILayout.Button("测试场景"))
+            {
+                IMG_PATH = IMG_PATH2 + "RayTracing12.png";
+                CreatePng(WIDTH, HEIGHT, CreateColorForTestScene(WIDTH, HEIGHT));
+            }
 
         }
 
+        #region 第一版（测试图片）
+        /// <summary>
+        /// 创建PNG图片颜色
+        /// </summary>
+        /// <param name="width"></param>
+        /// <param name="height"></param>
+        /// <returns>Color[]</returns>
         Color[] CreateColorForTestPNG(int width, int height)
         {
             int l = width * height;
@@ -109,6 +126,7 @@ namespace RayTracying
             fs.Close();
             bw.Close();
         }
+        #endregion
 
         #region 第二版（测试射线，简单的摄像机和背景）
         Color GetColorForTestRay(Ray ray)
@@ -485,6 +503,8 @@ namespace RayTracying
             hitalbeList.list.Add(new Sphere(new Vector3(-1, 0, -1), -0.45f, new Dielectric(1.5f)));
             Color[] colors = new Color[l];
             Camera camera = new Camera(original, lowLeftCorner, horizontal, vertical);
+            //Camera camera = new Camera(45, 2);
+            //Camera camera = new Camera(new Vector3(-2, 2, -1), new Vector3(0, 0, -1), new Vector3(0, 1, 0), 90, 2);
             float recip_width = 1f / width;
             float recip_height = 1f / height;
             for(int j = height - 1; j >= 0; j--)
@@ -508,6 +528,159 @@ namespace RayTracying
         }
         #endregion
 
+        #region 第十一版（测试景深）
+        Color GetColorForTestDefocus(Ray ray, HitableList hitableList, int depth)
+        {
+            HitRecord record = new HitRecord();
+            if(hitableList.Hit(ray, 0.0001f, float.MaxValue, ref record))
+            {
+                Ray r = new Ray(Vector3.zero, Vector3.zero);
+                Color attenuation = Color.black;
+                if(depth < MAX_SCATTER_TIME && record.material.scatter(ray, record, ref attenuation, ref r))
+                {
+                    Color c = GetColorForTestDefocus(r, hitableList, depth + 1);
+                    return new Color(c.r * attenuation.r, c.g * attenuation.g, c.b * attenuation.b);
+                }
+                else
+                {
+                    //假设已经反射了太多次，或者压根就没有发生反射，那么就认为黑了
+                    return Color.black;
+                }
+            }
+            float t = 0.5f * ray.normalDirection.y + 1f;
+            return (1 - t) * new Color(1, 1, 1) + t * new Color(0.5f, 0.7f, 1f);
+        }
+
+        Color[] CreateColorForTestDefocus(int width, int height)
+        {
+            //视锥体的左下角、长宽和起始扫射点设定
+            //Vector3 lowLeftCorner = new Vector3(-2, -1, -1);
+            //Vector3 horizontal = new Vector3(4, 0, 0);
+            //Vector3 vertical = new Vector3(0, 2, 0);
+            //Vector3 original = new Vector3(0, 0, 0);
+            int l = width * height;
+            HitableList hitableList = new HitableList();
+            //这里注释的两句话是随机场景渲染用的
+            //HitableList hitableList = _M.CreateRandomScene();
+            hitableList.list.Add(new Sphere(new Vector3(0, 0, -1), 0.5f, new Lambertian(new Color(0.2f, 0.2f, 0.8f))));
+            hitableList.list.Add(new Sphere(new Vector3(0, -100.5f, -1f), 100f, new Lambertian(new Color(0.8f, 0.8f, 0.0f))));
+            hitableList.list.Add(new Sphere(new Vector3(1, 0, -1), 0.5f, new Metal(new Color(0.8f, 0.6f, 0.2f), 0.0f)));
+            hitableList.list.Add(new Sphere(new Vector3(-1, 0, -1), 0.5f, new Dielectric(1.5f)));
+            Color[] colors = new Color[l];
+            //Vector3 from = new Vector3(10f, 2f, -2);
+            //Vector3 to = new Vector3(0, 1, 0);
+            Vector3 from = new Vector3(0f, 1f, 2f);
+            Vector3 to = new Vector3(0, 0, 0);
+            Camera camera = new Camera(from, to, Vector3.up, 90, (float)width / height);
+            //Camera camera = new Camera(from, to, Vector3.up, 35, width / height);
+            float recip_widht = 1f / width;
+            float recip_height = 1f / height;
+            for(int j = height - 1; j >= 0; j--)
+            {
+                for(int i = 0; i < width; i++)
+                {
+                    Color color = new Color(0, 0, 0);
+                    for(int s = 0; s < SAMPLE; s++)
+                    {
+                        Ray r = camera.CreateRay((i + _M.R()) * recip_widht, (j + _M.R()) * recip_height);
+                        color += GetColorForTestDefocus(r, hitableList, 0);
+                    }
+                    color *= SAMPLE_WEIGHT;
+                    //为了使球体看起来更亮，改变gamma值
+                    color = new Color(Mathf.Sqrt(color.r), Mathf.Sqrt(color.g), Mathf.Sqrt(color.b), 1f);
+                    color.a = 1f;
+                    colors[i + j * width] = color;
+                }
+                EditorUtility.DisplayProgressBar("", "", j / (float)height);
+            }
+            EditorUtility.ClearProgressBar();
+            return colors;
+        }
+        #endregion
+
+        #region 第十二版（实现封面）
+        HitableList GetRandomScene()
+        {
+            HitableList hitableList = new HitableList();
+            hitableList.list.Add(new Sphere(new Vector3(0, -1000, 0), 1000, new Lambertian(new Color(0.5f, 0.5f, 0.5f))));
+            for(int a = -11; a < 11; a++)
+            {
+                for(int b = -11; b < 11; b++)
+                {
+                    float choose_mat = _M.R();
+                    Vector3 center = new Vector3(a + 0.9f * _M.R(), 0.2f, b + 0.9f * _M.R()) ;
+                    if((center - new Vector3(4, 0.2f, 0)).magnitude > 0.9f)
+                    {
+                        if(choose_mat < 0.8) //diffuse
+                        {
+                            hitableList.list.Add(new Sphere(center, 0.2f, new Lambertian(new Color(_M.R() * _M.R(), _M.R() * _M.R(), _M.R() * _M.R()))));
+                        }
+                        else if(choose_mat < 0.95) //metal
+                        {
+                            hitableList.list.Add(new Sphere(center, 0.2f, new Metal(new Color(0.5f * (1 + _M.R()), 0.5f * (1 + _M.R()), 0.5f * _M.R()))));
+                        }
+                        else //glass
+                        {
+                            hitableList.list.Add(new Sphere(center, 0.2f, new Dielectric(1.5f)));
+                        }
+                    }
+                    
+                }
+            }
+
+            hitableList.list.Add(new Sphere(new Vector3(0, 1, 0), 1.0f, new Dielectric(1.5f)));
+            hitableList.list.Add(new Sphere(new Vector3(-4, 1, 0), 1.0f, new Lambertian(new Color(0.4f, 0.2f, 0.1f))));
+            hitableList.list.Add(new Sphere(new Vector3(4, 1, 0), 1.0f, new Metal(new Color(0.7f, 0.6f, 0.5f), 0.0f)));
+
+            return hitableList;
+        }
+
+        Color[] CreateColorForTestScene(int width, int height)
+        {
+            //视锥体的左下角、长宽和起始扫射点设定
+            //Vector3 lowLeftCorner = new Vector3(-2, -1, -1);
+            //Vector3 horizontal = new Vector3(4, 0, 0);
+            //Vector3 vertical = new Vector3(0, 2, 0);
+            //Vector3 original = new Vector3(0, 0, 0);
+            int l = width * height;
+            //HitableList hitableList = new HitableList();
+            //这里注释的两句话是随机场景渲染用的
+            //HitableList hitableList = _M.CreateRandomScene();
+            HitableList hitableList = GetRandomScene();
+             Color[] colors = new Color[l];
+            //Vector3 from = new Vector3(10f, 2f, -2);
+            //Vector3 to = new Vector3(0, 1, 0);
+            Vector3 from = new Vector3(13f, 2f, 3f);
+            Vector3 to = new Vector3(0, 0, 0);
+            Camera camera = new Camera(from, to, Vector3.up, 20, width / height, 0.0f, 0.7f * (from - to).magnitude);
+            //Camera camera = new Camera(from, to, Vector3.up, 35, width / height);
+            float recip_widht = 1f / width;
+            float recip_height = 1f / height;
+            for (int j = height - 1; j >= 0; j--)
+            {
+                for (int i = 0; i < width; i++)
+                {
+                    Color color = new Color(0, 0, 0);
+                    for (int s = 0; s < SAMPLE; s++)
+                    {
+                        Ray r = camera.CreateRay((i + _M.R()) * recip_widht, (j + _M.R()) * recip_height);
+                        color += GetColorForTestDefocus(r, hitableList, 0);
+                    }
+                    color *= SAMPLE_WEIGHT;
+                    //为了使球体看起来更亮，改变gamma值
+                    color = new Color(Mathf.Sqrt(color.r), Mathf.Sqrt(color.g), Mathf.Sqrt(color.b), 1f);
+                    color.a = 1f;
+                    colors[i + j * width] = color;
+
+                    EditorUtility.DisplayProgressBar("", "", (float)(i + j * width) / (float)l);
+                }
+               
+            }
+            EditorUtility.ClearProgressBar();
+            return colors;
+        }
+
+        #endregion
 
     }
 

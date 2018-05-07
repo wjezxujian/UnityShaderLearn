@@ -6,10 +6,23 @@ namespace RayTracying
 {
     public class _M
     {
-        public static Vector3 GetRandomPointInUintSphere()
+        public static Vector3 GetRandomPointInUnitSphere()
         {
             Vector3 p = 2f * new Vector3(_M.R(), _M.R(), 0) - new Vector3(1, 1, 0);
             p = p.normalized * _M.R();
+            return p;
+        }
+
+        /// <summary>
+        /// 这个去的是圆而不是球
+        /// </summary>
+        /// <param name="vin"></param>
+        /// <param name="normal"></param>
+        /// <returns></returns>
+        public static Vector3 GetRandomPointInUnitDisk()
+        {
+            Vector3 p = 2f * new Vector3(Random.Range(0f, 1f), Random.Range(0f, 1f), 0) - new Vector3(1, 1, 0);
+            p = p.normalized * Random.Range(0f, 1f);
             return p;
         }
 

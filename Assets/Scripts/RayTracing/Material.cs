@@ -63,7 +63,7 @@ namespace RayTracying
         public override bool scatter(Ray rayIn, HitRecord record, ref Color attenuation, ref Ray scattered)
         {
             Vector3 reflected = _M.reflect(rayIn.normalDirection, record.normal);
-            scattered = new Ray(record.p, reflected + fuzz * _M.GetRandomPointInUintSphere());
+            scattered = new Ray(record.p, reflected + fuzz * _M.GetRandomPointInUnitSphere());
             attenuation = albedo;
             return Vector3.Dot(scattered.direction, record.normal) > 0;
         }
@@ -109,7 +109,7 @@ namespace RayTracying
             {
                 outNormal = record.normal;
                 ni_no = 1f / ref_idx;
-                cos = -ni_no * Vector3.Dot(rayIn.normalDirection, record.normal);
+                cos = -Vector3.Dot(rayIn.normalDirection, record.normal);
             }
 
             //如果没发生折射，就用反射
@@ -131,7 +131,6 @@ namespace RayTracying
             else
             {
                 scattered = new Ray(record.p, refracted);
-                return false;
             }
 
             return true;
