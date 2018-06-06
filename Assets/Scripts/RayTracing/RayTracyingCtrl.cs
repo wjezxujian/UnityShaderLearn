@@ -14,7 +14,7 @@ namespace RayTracying
         private const int HEIGHT = 400;
         private string IMG_PATH = "";
         private string IMG_PATH2 = "C:/Users/jian/Desktop/";
-        private const int SAMPLE = 100;
+        private const int SAMPLE = 4;
         private float SAMPLE_WEIGHT = 0.01f;
         private int MAX_SCATTER_TIME = 50;
 
