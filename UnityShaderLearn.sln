@@ -3,6 +3,8 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnityShaderLearn", "Assembly-CSharp.csproj", "{B1E67DC5-2D30-5635-29C3-DB7FAF91B3D0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnityShaderLearn", "Assembly-CSharp-Editor.csproj", "{27DC9ACE-52FD-3A93-4FBA-FDE4531F64A7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -13,6 +15,10 @@ Global
 		{B1E67DC5-2D30-5635-29C3-DB7FAF91B3D0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B1E67DC5-2D30-5635-29C3-DB7FAF91B3D0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B1E67DC5-2D30-5635-29C3-DB7FAF91B3D0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{27DC9ACE-52FD-3A93-4FBA-FDE4531F64A7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{27DC9ACE-52FD-3A93-4FBA-FDE4531F64A7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{27DC9ACE-52FD-3A93-4FBA-FDE4531F64A7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{27DC9ACE-52FD-3A93-4FBA-FDE4531F64A7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
