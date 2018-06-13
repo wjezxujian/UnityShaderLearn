@@ -1,48 +1,102 @@
-﻿Shader "Custom/Chapter10-GlassRefraction" {
+﻿Shader "UnityShaderLearn/Chapter10-GlassRefraction" {
 	Properties {
-		_Color ("Color", Color) = (1,1,1,1)
-		_MainTex ("Albedo (RGB)", 2D) = "white" {}
-		_Glossiness ("Smoothness", Range(0,1)) = 0.5
-		_Metallic ("Metallic", Range(0,1)) = 0.0
+		_MainTex ("Main Tex", 2D) = "white" {}
+		_BumpMap ("Normal Map", 2D) = "bump" {}
+		_Cubemap ("Environment Cubemap", Cube) = "_Skybox" {}
+		_Distortion ("Distortion", Range(0, 100)) = 10
+		_RefractAmount ("Refract Amount", Range(0.0, 1.0)) = 1.0
 	}
 	SubShader {
-		Tags { "RenderType"="Opaque" }
-		LOD 200
+		// We must be transparent, so other objects are drawn before this one.
+		Tags { "Queue"="Transparent" "RenderType"="Opaque" }
 
-		CGPROGRAM
-		// Physically based Standard lighting model, and enable shadows on all light types
-		#pragma surface surf Standard fullforwardshadows
+		// This pass grabs the screen behind the object into a texture.
+		// We can access the result in the next pass as _RefractionTex
+		GrabPass { "_RefractionTex" }
 
-		// Use shader model 3.0 target, to get nicer looking lighting
-		#pragma target 3.0
+		Pass {
+			CGPROGRAM
 
-		sampler2D _MainTex;
+			#pragma vertex vert
+			#pragma fragment frag
 
-		struct Input {
-			float2 uv_MainTex;
-		};
+			#include "UnityCG.cginc"
 
-		half _Glossiness;
-		half _Metallic;
-		fixed4 _Color;
+			sampler2D _MainTex;
+			float4 _MainTex_ST;
+			sampler2D _BumpMap;
+			float4 _BumpMap_ST;
+			samplerCUBE _Cubemap;
+			float _Distortion;
+			fixed _RefractAmount;
+			sampler2D _RefractionTex;
+			float4 _RefractionTex_TexelSize;
+			
+			struct a2v {
+				float4 vertex : POSITION;
+				float3 normal : NORMAL;
+				float4 tangent : TANGENT;
+				float2 texcoord : TEXCOORD0;
+			};
 
-		// Add instancing support for this shader. You need to check 'Enable Instancing' on materials that use the shader.
-		// See https://docs.unity3d.com/Manual/GPUInstancing.html for more information about instancing.
-		// #pragma instancing_options assumeuniformscaling
-		UNITY_INSTANCING_BUFFER_START(Props)
-			// put more per-instance properties here
-		UNITY_INSTANCING_BUFFER_END(Props)
+			struct v2f {
+				float4 pos : SV_POSITION;
+				float4 scrPos : TEXCOORD0;
+				float4 uv : TEXCOORD1;
+				float4 TtoW0 : TEXCOORD2;
+				float4 TtoW1 : TEXCOORD3;
+				float4 TtoW2 : TEXCOORD4;
+			};
 
-		void surf (Input IN, inout SurfaceOutputStandard o) {
-			// Albedo comes from a texture tinted by color
-			fixed4 c = tex2D (_MainTex, IN.uv_MainTex) * _Color;
-			o.Albedo = c.rgb;
-			// Metallic and smoothness come from slider variables
-			o.Metallic = _Metallic;
-			o.Smoothness = _Glossiness;
-			o.Alpha = c.a;
+			v2f vert(a2v v) {
+				v2f o;
+				o.pos = UnityObjectToClipPos(v.vertex);
+
+				o.scrPos = ComputeGrabScreenPos(o.pos);
+
+				o.uv.xy = TRANSFORM_TEX(v.texcoord, _MainTex);
+				o.uv.zw = TRANSFORM_TEX(v.texcoord, _BumpMap);
+
+				float3 worldPos = mul(unity_ObjectToWorld, v.vertex).xyz;
+				fixed3 worldNormal = UnityObjectToWorldNormal(v.normal);
+				fixed3 worldTangent = UnityObjectToWorldDir(v.tangent.xyz);
+				fixed3 worldBinormal = cross(worldNormal, worldTangent) * v.tangent.w;
+
+				o.TtoW0 = float4(worldTangent.x, worldBinormal.x, worldNormal.x, worldPos.x);  
+				o.TtoW1 = float4(worldTangent.y, worldBinormal.y, worldNormal.y, worldPos.y);  
+				o.TtoW2 = float4(worldTangent.z, worldBinormal.z, worldNormal.z, worldPos.z);  
+				
+				return o;
+			}
+
+			fixed4 frag(v2f i) : SV_Target {
+				float3 worldPos = float3(i.TtoW0.w, i.TtoW1.w, i.TtoW2.w);
+				fixed3 worldViewDir = normalize(UnityWorldSpaceViewDir(worldPos));
+
+				// Get the normal in tangent space
+				fixed3 bump = UnpackNormal(tex2D(_BumpMap, i.uv.zw));
+
+				// Compute the offset in tangent space
+				float2 offset = bump.xy * _Distortion * _RefractionTex_TexelSize.xy;
+				i.scrPos.xy = offset * i.scrPos.z + i.scrPos.xy;
+				fixed3 refrCol = tex2D(_RefractionTex, i.scrPos.xy / i.scrPos.w).rgb;
+
+				// Convert the normal to world space
+				bump = normalize(half3(dot(i.TtoW0.xyz, bump), dot(i.TtoW1.xyz, bump), dot(i.TtoW2.xyz, bump)));
+				fixed3 reflDir = reflect(-worldViewDir, bump);
+				fixed4 texColor = tex2D(_MainTex, i.uv.xy);
+				fixed3 reflCol = texCUBE(_Cubemap, reflDir).rgb * texColor.rgb;
+
+				fixed3 finalColor = reflCol * (1 - _RefractAmount) + refrCol * _RefractAmount;
+
+				return fixed4(finalColor, 1.0);
+			}
+
+
+			ENDCG
 		}
-		ENDCG
+		
+
 	}
 	FallBack "Diffuse"
 }
