@@ -59,6 +59,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Scripts\Chapter10\ProceduralTextureGeneration.cs" />
+    <Compile Include="Assets\Scripts\Chapter12\BrightnessSaturationAndContrast.cs" />
+    <Compile Include="Assets\Scripts\Chapter12\EdgeDetection.cs" />
+    <Compile Include="Assets\Scripts\Chapter12\PostEffectBase.cs" />
     <Compile Include="Assets\Scripts\Chapter5\ColorPicker.cs" />
     <Compile Include="Assets\Scripts\Helpers\SetPropertyAttribute.cs" />
     <Compile Include="Assets\Scripts\RayTracing\_M.cs" />
@@ -71,6 +74,7 @@
     <None Include="Assets\Shaders\Chapter6\Chapter6-HalfLambert.shader" />
     <None Include="Assets\Shaders\Chapter9\Chapter9-AttenuationAndShadowUseBuildInFunctions.shader" />
     <None Include="Assets\Shaders\Chapter7\Chapter7-NormalMapWorldSpace.shader" />
+    <None Include="Assets\Shaders\Chapter12\Chapter12-BrightnessSaturationAndContrast.shader" />
     <None Include="Assets\Shaders\Chapter11\Chapter11-VertexAnimationWithShader.shader" />
     <None Include="Assets\Shaders\Chapter8\Chapter8-AlphaTestBothSided.shader" />
     <None Include="Assets\Shaders\Chapter8\Chapter8-AlphaBlendZWrite.shader" />
@@ -101,6 +105,7 @@
     <None Include="Assets\Shaders\Chapter9\Chapter9-ForwardRendering.shader" />
     <None Include="Assets\Shaders\Chapter6\Chapter6-BlinnPhong.shader" />
     <None Include="Assets\Shaders\Chapter10\Chapter10-Mirror.shader" />
+    <None Include="Assets\Shaders\Chapter12\Chapter12-EdgeDetaction.shader" />
     <Reference Include="UnityEditor.StandardEvents">
       <HintPath>D:/Projects/UnityShaderLearn/Library/ScriptAssemblies/UnityEditor.StandardEvents.dll</HintPath>
     </Reference>
