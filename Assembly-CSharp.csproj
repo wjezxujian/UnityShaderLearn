@@ -59,8 +59,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Scripts\Chapter10\ProceduralTextureGeneration.cs" />
+    <Compile Include="Assets\Scripts\Chapter12\Bloom.cs" />
     <Compile Include="Assets\Scripts\Chapter12\BrightnessSaturationAndContrast.cs" />
     <Compile Include="Assets\Scripts\Chapter12\EdgeDetection.cs" />
+    <Compile Include="Assets\Scripts\Chapter12\GaussianBlur.cs" />
     <Compile Include="Assets\Scripts\Chapter12\PostEffectBase.cs" />
     <Compile Include="Assets\Scripts\Chapter5\ColorPicker.cs" />
     <Compile Include="Assets\Scripts\Helpers\SetPropertyAttribute.cs" />
@@ -78,6 +80,7 @@
     <None Include="Assets\Shaders\Chapter11\Chapter11-VertexAnimationWithShader.shader" />
     <None Include="Assets\Shaders\Chapter8\Chapter8-AlphaTestBothSided.shader" />
     <None Include="Assets\Shaders\Chapter8\Chapter8-AlphaBlendZWrite.shader" />
+    <None Include="Assets\Shaders\Chapter12\Chapter12-Bloom.shader" />
     <None Include="Assets\Shaders\Chapter11\Chapter11-ScrollingBackground.shader" />
     <None Include="Assets\Shaders\Chapter5\Chapter5-FlaseColor.shader" />
     <None Include="Assets\Shaders\Chapter6\Chapter6-SpecularVertexLevel.shader" />
@@ -89,6 +92,7 @@
     <None Include="Assets\Shaders\Chapter11\Chapter11-ImageSequenceAnimation.shader" />
     <None Include="Assets\Shaders\Chapter7\Chapter7-SingleTexture.shader" />
     <None Include="Assets\Shaders\Chapter5\Chapter5-SimpleShader.shader" />
+    <None Include="Assets\Shaders\Chapter12\Chapter12-GaussianBlur.shader" />
     <None Include="Assets\Shaders\Chapter6\Chapter6-SpecularPixelLevel.shader" />
     <None Include="Assets\Shaders\Chapter8\Chapter8-AlphaBlendBothSided.shader" />
     <None Include="Assets\Shaders\Chapter10\Chapter10-Reflection.shader" />
@@ -107,10 +111,10 @@
     <None Include="Assets\Shaders\Chapter10\Chapter10-Mirror.shader" />
     <None Include="Assets\Shaders\Chapter12\Chapter12-EdgeDetaction.shader" />
     <Reference Include="UnityEditor.StandardEvents">
-      <HintPath>D:/Projects/UnityShaderLearn/Library/ScriptAssemblies/UnityEditor.StandardEvents.dll</HintPath>
+      <HintPath>D:/UnityShaderLearn/Library/ScriptAssemblies/UnityEditor.StandardEvents.dll</HintPath>
     </Reference>
     <Reference Include="Unity.PackageManagerUI.Editor">
-      <HintPath>D:/Projects/UnityShaderLearn/Library/ScriptAssemblies/Unity.PackageManagerUI.Editor.dll</HintPath>
+      <HintPath>D:/UnityShaderLearn/Library/ScriptAssemblies/Unity.PackageManagerUI.Editor.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.AIModule">
       <HintPath>D:/Program Files/Unity/Editor/Data/Managed/UnityEngine/UnityEngine.AIModule.dll</HintPath>
@@ -308,13 +312,13 @@
       <HintPath>D:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/UnitySpatialTracking/RuntimeEditor/UnityEngine.SpatialTracking.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.Analytics">
-      <HintPath>C:/Users/jian.xu/AppData/Local/Unity/cache/packages/packages.unity.com/com.unity.analytics@2.0.16/UnityEngine.Analytics.dll</HintPath>
+      <HintPath>C:/Users/Jian/AppData/Local/Unity/cache/packages/packages.unity.com/com.unity.analytics@2.0.16/UnityEngine.Analytics.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.Purchasing">
-      <HintPath>C:/Users/jian.xu/AppData/Local/Unity/cache/packages/packages.unity.com/com.unity.purchasing@2.0.1/UnityEngine.Purchasing.dll</HintPath>
+      <HintPath>C:/Users/Jian/AppData/Local/Unity/cache/packages/packages.unity.com/com.unity.purchasing@2.0.1/UnityEngine.Purchasing.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.StandardEvents">
-      <HintPath>C:/Users/jian.xu/AppData/Local/Unity/cache/packages/packages.unity.com/com.unity.standardevents@1.0.13/UnityEngine.StandardEvents.dll</HintPath>
+      <HintPath>C:/Users/Jian/AppData/Local/Unity/cache/packages/packages.unity.com/com.unity.standardevents@1.0.13/UnityEngine.StandardEvents.dll</HintPath>
     </Reference>
     <Reference Include="mscorlib">
       <HintPath>D:/Program Files/Unity/Editor/Data/MonoBleedingEdge/lib/mono/4.7.1-api/mscorlib.dll</HintPath>
