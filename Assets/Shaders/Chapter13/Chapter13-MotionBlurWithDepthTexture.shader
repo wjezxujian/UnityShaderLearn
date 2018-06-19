@@ -5,9 +5,11 @@
 	}
 	SubShader {
 		CGINCLUDE
+		
+		#include "UnityCG.cginc"
 
 		sampler2D _MainTex;
-		half4 _MainTex_TexlelSize;
+		half4 _MainTex_TexelSize;
 		sampler2D _CameraDepthTexture;
 		float4x4 _CurrentViewProjectionInverseMatrix;
 		float4x4 _PreviousViewProjectionMatrix;
@@ -28,8 +30,8 @@
 			o.uv_depth = v.texcoord;
 
 			#if UNITY_UV_STARTS_AT_TOP
-			if(_MainTex_TexlelSize.y < 0)
-				o.uv_depth.y = 1 - o.uv_depth.y;
+			if(_MainTex_TexelSize.y < 0)
+				o.uv_depth.y = 1 - o.uv_depth.y; 
 			#endif
 
 			return o;
@@ -39,9 +41,9 @@
 			// Get the depth buffer value at this pixel
 			float d = SAMPLE_DEPTH_TEXTURE(_CameraDepthTexture, i.uv_depth);
 			// H is the viewport position at this pixel in the range -1 to 1.
-			float4 H = float4(i.uv.x * 2 - 1, i.uv.y * 2 - 1, d * 2 - 1， 1);
+			float4 H = float4(i.uv.x * 2 - 1, i.uv.y * 2 - 1, d * 2 - 1, 1);
 			// Transform by the view-projection inverse.
-			float4 D = mul(_CurrentViewPositionInverseMatrix, H);
+			float4 D = mul(_CurrentViewProjectionInverseMatrix, H);
 			// Divide by w to get the world position.
 			float4 worldPos = D / D.w;
 
@@ -63,6 +65,8 @@
 				float4 currentColor = tex2D(_MainTex, uv);
 				c += currentColor;
 			}
+
+			c /= 3;
 
 			return fixed4(c.rgb, 1.0);
 		}
