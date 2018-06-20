@@ -68,6 +68,7 @@
     <Compile Include="Assets\Scripts\Chapter13\EdgeDetectNormalsAndDepth.cs" />
     <Compile Include="Assets\Scripts\Chapter13\FogWithDepthTexture.cs" />
     <Compile Include="Assets\Scripts\Chapter13\MotionBlurWithDepthTexture.cs" />
+    <Compile Include="Assets\Scripts\Chapter15\BurnHelper.cs" />
     <Compile Include="Assets\Scripts\Chapter5\ColorPicker.cs" />
     <Compile Include="Assets\Scripts\Helpers\SetPropertyAttribute.cs" />
     <Compile Include="Assets\Scripts\Helpers\Translating.cs" />
@@ -82,6 +83,7 @@
     <None Include="Assets\Shaders\Chapter9\Chapter9-AttenuationAndShadowUseBuildInFunctions.shader" />
     <None Include="Assets\Shaders\Chapter13\Chapter13-MotionBlurWithDepthTexture.shader" />
     <None Include="Assets\Shaders\Chapter7\Chapter7-NormalMapWorldSpace.shader" />
+    <None Include="Assets\Shaders\Chapter15\Chapter15-WateWave.shader" />
     <None Include="Assets\Shaders\Chapter13\Chapter13-EdgeDetectNormalAndDepth.shader" />
     <None Include="Assets\Shaders\Chapter12\Chapter12-MotionBlur.shader" />
     <None Include="Assets\Shaders\Chapter12\Chapter12-BrightnessSaturationAndContrast.shader" />
@@ -110,20 +112,23 @@
     <None Include="Assets\Shaders\Chapter6\Chapter6-DiffuseVertexLevel.shader" />
     <None Include="Assets\Shaders\Common\BumpedDiffuse.shader" />
     <None Include="Assets\Shaders\Chapter11\Chapter11-BillBoard.shader" />
+    <None Include="Assets\Shaders\Chapter14\Chapter14-ToonShading.shader" />
     <None Include="Assets\Shaders\Chapter11\Chapter11-Water.shader" />
     <None Include="Assets\Shaders\Common\BumpedSpecular.shader" />
     <None Include="Assets\Shaders\Chapter9\Chapter9-Shadow.shader" />
     <None Include="Assets\Shaders\Chapter6\Chapter6-BlinnPhongUseBuildInFunction.shader" />
     <None Include="Assets\Shaders\Chapter7\Chapter7-RampTexture.shader" />
+    <None Include="Assets\Shaders\Chapter15\Chapter15-Dissolve.shader" />
+    <None Include="Assets\Shaders\Chapter14\Chapter14-Hatching.shader" />
     <None Include="Assets\Shaders\Chapter9\Chapter9-ForwardRendering.shader" />
     <None Include="Assets\Shaders\Chapter6\Chapter6-BlinnPhong.shader" />
     <None Include="Assets\Shaders\Chapter10\Chapter10-Mirror.shader" />
     <None Include="Assets\Shaders\Chapter12\Chapter12-EdgeDetaction.shader" />
     <Reference Include="UnityEditor.StandardEvents">
-      <HintPath>D:/UnityShaderLearn/Library/ScriptAssemblies/UnityEditor.StandardEvents.dll</HintPath>
+      <HintPath>D:/Projects/UnityShaderLearn/Library/ScriptAssemblies/UnityEditor.StandardEvents.dll</HintPath>
     </Reference>
     <Reference Include="Unity.PackageManagerUI.Editor">
-      <HintPath>D:/UnityShaderLearn/Library/ScriptAssemblies/Unity.PackageManagerUI.Editor.dll</HintPath>
+      <HintPath>D:/Projects/UnityShaderLearn/Library/ScriptAssemblies/Unity.PackageManagerUI.Editor.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.AIModule">
       <HintPath>D:/Program Files/Unity/Editor/Data/Managed/UnityEngine/UnityEngine.AIModule.dll</HintPath>
@@ -321,13 +326,13 @@
       <HintPath>D:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/UnitySpatialTracking/RuntimeEditor/UnityEngine.SpatialTracking.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.Analytics">
-      <HintPath>C:/Users/Jian/AppData/Local/Unity/cache/packages/packages.unity.com/com.unity.analytics@2.0.16/UnityEngine.Analytics.dll</HintPath>
+      <HintPath>C:/Users/jian.xu/AppData/Local/Unity/cache/packages/packages.unity.com/com.unity.analytics@2.0.16/UnityEngine.Analytics.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.Purchasing">
-      <HintPath>C:/Users/Jian/AppData/Local/Unity/cache/packages/packages.unity.com/com.unity.purchasing@2.0.1/UnityEngine.Purchasing.dll</HintPath>
+      <HintPath>C:/Users/jian.xu/AppData/Local/Unity/cache/packages/packages.unity.com/com.unity.purchasing@2.0.1/UnityEngine.Purchasing.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.StandardEvents">
-      <HintPath>C:/Users/Jian/AppData/Local/Unity/cache/packages/packages.unity.com/com.unity.standardevents@1.0.13/UnityEngine.StandardEvents.dll</HintPath>
+      <HintPath>C:/Users/jian.xu/AppData/Local/Unity/cache/packages/packages.unity.com/com.unity.standardevents@1.0.13/UnityEngine.StandardEvents.dll</HintPath>
     </Reference>
     <Reference Include="mscorlib">
       <HintPath>D:/Program Files/Unity/Editor/Data/MonoBleedingEdge/lib/mono/4.7.1-api/mscorlib.dll</HintPath>
