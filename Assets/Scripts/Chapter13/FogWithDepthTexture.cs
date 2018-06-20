@@ -56,7 +56,7 @@ public class FogWithDepthTexture : PostEffectBase
         camera.depthTextureMode |= DepthTextureMode.Depth;
     }
 
-    private void OnRenderImage(RenderTexture source, RenderTexture destination)
+    void OnRenderImage(RenderTexture source, RenderTexture destination)
     {
         if (material != null)
         {
@@ -64,7 +64,6 @@ public class FogWithDepthTexture : PostEffectBase
 
             float fov = camera.fieldOfView;
             float near = camera.nearClipPlane;
-            float far = camera.farClipPlane;
             float aspect = camera.aspect;
 
             float halfHeight = near * Mathf.Tan(fov * 0.5f * Mathf.Deg2Rad);
@@ -92,10 +91,9 @@ public class FogWithDepthTexture : PostEffectBase
             frustumCorners.SetRow(0, bottomLeft);
             frustumCorners.SetRow(1, bottomRight);
             frustumCorners.SetRow(2, topRight);
-            frustumCorners.SetRow(3, topRight);
+            frustumCorners.SetRow(3, topLeft);
 
             material.SetMatrix("_FrustumCornersRay", frustumCorners);
-            material.SetMatrix("_ViewProjectionInverseMatrix", (camera.projectionMatrix * camera.worldToCameraMatrix).inverse);
 
             material.SetFloat("_FogDesity", fogDensity);
             material.SetColor("_FogColor", fogColor);

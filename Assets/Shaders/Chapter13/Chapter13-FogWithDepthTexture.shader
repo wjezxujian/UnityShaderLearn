@@ -1,4 +1,4 @@
-﻿Shader "Custom/Chapter13-FogWithDepthTexture" {
+﻿Shader "UnityShaderLearn/Chapter13-FogWithDepthTexture" {
 	Properties {
 		_MainTex ("Base (RGB)", 2D) = "white" {}
 		_FogDensity ("Fog Density", Float) = 1.0
@@ -17,7 +17,7 @@
 		half4 _MainTex_TexelSize;
 		sampler2D _CameraDepthTexture;
 		half _FogDensity;
-		fixed4 _FogCOlor;
+		fixed4 _FogColor;
 		float _FogStart;
 		float _FogEnd;
 
@@ -69,13 +69,23 @@
 			fogDensity = saturate(fogDensity * _FogDensity);
 
 			fixed4 finalColor = tex2D(_MainTex, i.uv);
-			fianlColor.rgb = lerp(finalColor.rgb, _FogColor.rgb, fogDensity);
+			finalColor.rgb = lerp(finalColor.rgb, _FogColor.rgb, fogDensity);
 
-			return finalColor;
+			return finalColor; 
 		}
 
 		ENDCG
 
+		Pass {
+			ZTest Always Cull Off ZWrite Off
+
+			CGPROGRAM
+
+			#pragma vertex vert
+			#pragma fragment frag
+
+			ENDCG
+		}
 		
 	}
 	FallBack Off
