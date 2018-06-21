@@ -100,6 +100,7 @@
 				fixed3 reflCol = texCUBE(_Cubemap, reflDir).rgb * texColor.rgb * _Color.rgb;
 
 				fixed fresnel = pow(1 - saturate(dot(viewDir, bump)), 4);
+				//fixed fresnel = 0.2;
 				fixed3 finalColor = reflCol * fresnel + refrCol * (1 - fresnel);
 
 				return fixed4(finalColor, 1.0);
